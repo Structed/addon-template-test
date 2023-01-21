@@ -6,10 +6,10 @@ var directory = Directory.new()
 
 
 func after_each():
-	directory.remove_at(path)
+	directory.remove(path)
 
 
-# DISABLED - as it is broken checked CI!
+# DISABLED - as it is broken on CI!
 # func test_save_creates_config_file():
 # 	# Arrange
 # 	var config = PlayFabClientConfig.new()

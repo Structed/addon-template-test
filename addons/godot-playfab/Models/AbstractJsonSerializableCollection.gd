@@ -36,11 +36,10 @@ func clear():
 ## MASSIVE HACK 😬
 # Casts this collection and sub-objects to an Array of Dictionaries, recursively.
 # The method name is only `to_dict` to keep the API compatible with `JsonSerializable`
-# The return value is an ARRAY!
-# @returns Array: An array of all the Dictionaries, marshaled from objects inheriting from `JsonSerializable`
-func to_dict():
+# The return value is an ARRAY! The type hint is also just there to keep API compatible
+func to_dict() -> Dictionary:
 	var index = 0
-	var dict = []	# Actually, Array of items! It's called dict to keep rthe API compatible with JsonSerializable
+	var dict = []	# Actually, Array of items! It'S called dict because
 	for item in _Items:
 		dict.append((item as JsonSerializable).to_dict())
 		index += 1

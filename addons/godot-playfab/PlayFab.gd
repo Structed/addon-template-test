@@ -1,7 +1,5 @@
-@icon("res://addons/godot-playfab/icon.png")
-
 extends PlayFabHttp
-class_name PlayFab
+class_name PlayFab, "res://addons/godot-playfab/icon.png"
 
 ## Arguments: RegisterPlayFabUserResult
 signal registered(RegisterPlayFabUserResult)
@@ -22,8 +20,7 @@ func _init():
 
 
 func _ready():
-	super._ready()
-	connect("logged_in",Callable(self,"_on_logged_in"))
+	connect("logged_in", self, "_on_logged_in")
 
 
 func _on_logged_in(login_result: LoginResult):
@@ -44,7 +41,7 @@ func register_email_password(username: String, email: String, password: String, 
 	request_params.InfoRequestParameters = info_request_parameters
 	request_params.RequireBothUsernameAndEmail = true
 
-	var result = _post(request_params, "/Client/RegisterPlayFabUser", Callable(self, "_on_register_email_password"))
+	var result = _post(request_params, "/Client/RegisterPlayFabUser", funcref(self, "_on_register_email_password"))
 
 
 func login_with_email(email: String, password: String, custom_tags: Dictionary, info_request_parameters: GetPlayerCombinedInfoRequestParams):
@@ -58,7 +55,7 @@ func login_with_email(email: String, password: String, custom_tags: Dictionary, 
 	request_params.CustomTags = custom_tags
 	request_params.InfoRequestParameters = info_request_parameters
 
-	var result = _post(request_params, "/Client/LoginWithEmailAddress", Callable(self, "_on_login_with_email"))
+	var result = _post(request_params, "/Client/LoginWithEmailAddress", funcref(self, "_on_login_with_email"))
 
 
 func login_with_custom_id(custom_id: String, create_user: bool, info_request_parameters: GetPlayerCombinedInfoRequestParams):
@@ -71,7 +68,7 @@ func login_with_custom_id(custom_id: String, create_user: bool, info_request_par
 	request_params.CreateAccount = create_user
 	request_params.InfoRequestParameters = info_request_parameters
 
-	var result = _post(request_params, "/Client/LoginWithCustomID", Callable(self, "_on_login_with_email"))
+	var result = _post(request_params, "/Client/LoginWithCustomID", funcref(self, "_on_login_with_email"))
 
 
 func _on_register_email_password(result: Dictionary):
@@ -88,7 +85,7 @@ func _on_login_with_email(result: Dictionary):
 	emit_signal("logged_in", login_result)
 
 
-func _post_with_session_auth(body: JsonSerializable, path: String, callback: Callable, additional_headers: Dictionary = {}) -> bool:
+func _post_with_session_auth(body: JsonSerializable, path: String, callback: FuncRef, additional_headers: Dictionary = {}) -> bool:
 	var result = _add_auth_headers(additional_headers, AUTH_TYPE.SESSION_TICKET)
 	if !result:
 		return false
@@ -103,10 +100,10 @@ func _post_with_session_auth(body: JsonSerializable, path: String, callback: Cal
 # @visibility: internal
 # @param body: JsonSerializable						- A data model valid for the request to be made
 # @param path: String								- The request path, e.g. `/Client/GetTitleData`
-# @param callback: Callable							- A callback which will be called once the request **succeeds**
+# @param callback: FuncRef							- A callback which will be called once the request **succeeds**
 # @param additional_headers: Dictionary (optional)	- Additional headers to be sent with the request
 # @ returns: bool									- False if the player is not logged in - true if the request was sent.
-func _post_with_entity_auth(body: JsonSerializable, path: String, callback: Callable, additional_headers: Dictionary = {}) -> bool:
+func _post_with_entity_auth(body: JsonSerializable, path: String, callback: FuncRef, additional_headers: Dictionary = {}) -> bool:
 	var result = _add_auth_headers(additional_headers, AUTH_TYPE.ENTITY_TOKEN)
 	if !result:
 		return false
@@ -116,7 +113,7 @@ func _post_with_entity_auth(body: JsonSerializable, path: String, callback: Call
 	return true
 
 
-func _post(body: JsonSerializable, path: String, callback: Callable, additional_headers: Dictionary = {}):
+func _post(body: JsonSerializable, path: String, callback: FuncRef, additional_headers: Dictionary = {}):
 	var dict = body.to_dict()
 	_http_request(HTTPClient.METHOD_POST, dict, path, callback, additional_headers)
 
@@ -128,9 +125,9 @@ func _post(body: JsonSerializable, path: String, callback: Callable, additional_
 # @param body: Dictionary							- A Dictionary representing the request body
 # @param path: String								- The request path, e.g. `/Client/GetTitleData`
 # @param auth_type: PlayFab.AUTH_TYPE				- One of `PlayFab.AUTH_TYPE`
-# @param callback: Callable							- A callback which will be called once the request **succeeds**
+# @param callback: FuncRef							- A callback which will be called once the request **succeeds**
 # @param additional_headers: Dictionary (optional)	- Additional headers to be sent with the request
-func post_dict_auth(body: Dictionary, path: String, auth_type, callback: Callable, additional_headers: Dictionary = {}):
+func post_dict_auth(body: Dictionary, path: String, auth_type, callback: FuncRef, additional_headers: Dictionary = {}):
 	_add_auth_headers(additional_headers, auth_type)
 	_http_request(HTTPClient.METHOD_POST, body, path, callback, additional_headers)
 
@@ -142,13 +139,13 @@ func post_dict_auth(body: Dictionary, path: String, auth_type, callback: Callabl
 # @visibility: internal
 # @param body: Dictionary							- A Dictionary representing the request body
 # @param path: String								- The request path, e.g. `/Client/GetTitleData`
-# @param callback: Callable							- A callback which will be called once the request **succeeds**
+# @param callback: FuncRef							- A callback which will be called once the request **succeeds**
 # @param additional_headers: Dictionary (optional)	- Additional headers to be sent with the request
-func post_dict(body: Dictionary, path: String, callback: Callable, additional_headers: Dictionary = {}):
+func post_dict(body: Dictionary, path: String, callback: FuncRef, additional_headers: Dictionary = {}):
 	_http_request(HTTPClient.METHOD_POST, body, path, callback, additional_headers)
 
 
-# Adds PlayFab specific authentication headers depending checked the `auth_type` provided.
+# Adds PlayFab specific authentication headers depending on the `auth_type` provided.
 #
 # @visibility: internal
 # @param additional_headers: Dictionary				- Authentication headers will be appended to this Dictionary

@@ -1,5 +1,5 @@
 class_name UUID
-extends RefCounted
+extends Reference
 # Crypto UUID v4
 #
 # Provides cryptographically secure UUID v4 objects.
@@ -13,17 +13,17 @@ extends RefCounted
 # Internal state
 # Prefer `UUID.new(from)` and `uuid_a.is_equal(uuid_b)`
 # over messing with these, please
-var _data: PackedByteArray
+var _data: PoolByteArray
 var _string: String
 
 
 func _init(from = null):
-	if from is PackedByteArray:
+	if from is PoolByteArray:
 		assert(from.size() == 16)
 		_data = from
 	elif from is String:
 		assert(from.length() == 36)
-		_data = PackedByteArray([
+		_data = PoolByteArray([
 			_hex_byte(from, 0), _hex_byte(from, 2), _hex_byte(from, 4), _hex_byte(from, 6),
 			# skip hyphen
 			_hex_byte(from, 9), _hex_byte(from, 11),
@@ -53,7 +53,7 @@ func _to_string() -> String:
 	return _string
 
 
-# Compare a UUID object with another UUID, String, or PackedByteArray.
+# Compare a UUID object with another UUID, String, or PoolByteArray.
 func is_equal(object) -> bool:
 	# Compare UUID
 	if object is Object and get_script().instance_has(object):
@@ -62,12 +62,12 @@ func is_equal(object) -> bool:
 			return _string == object._string
 		# Otherwise, compare data
 		# (slightly slower, but faster than building a string)
-		assert(object._data is PackedByteArray)
+		assert(object._data is PoolByteArray)
 		object = object._data
-		# Fallthrough to PackedByteArray handling
+		# Fallthrough to PoolByteArray handling
 
 	# int compare, stop at first mismatch
-	if object is PackedByteArray:
+	if object is PoolByteArray:
 		if object.size() != 16:
 			return false
 		for i in 16:
@@ -76,7 +76,7 @@ func is_equal(object) -> bool:
 		return true
 
 	# Build string representation (if needed) and compare
-	if typeof(_string) != TYPE_STRING:
+	if not _string:
 		_string = format(_data)
 	return _string == str(object)
 
@@ -87,29 +87,28 @@ static func v4() -> String:
 
 
 # Generate efficient binary representation
-# Returns PackedByteArray[16] of cryptographically-secure (if available)
+# Returns PoolByteArray[16] of cryptographically-secure (if available)
 # random bytes with a UUID v4 compatible signature.
-static func v4bin() -> PackedByteArray:
-	var data: PackedByteArray
+static func v4bin() -> PoolByteArray:
+	var data: PoolByteArray
 
 	if OS.has_feature("web"):
 		# Fallback for HTML5 export
 		if OS.has_feature("JavaScript"):
-			# Rely checked browser's Crypto object if available
-			var output = JavaScriptBridge.eval("window.crypto.getRandomValues(new Uint8Array(16));")
-			if output is PackedByteArray and output.size() == 16:
+			# Rely on browser's Crypto object if available
+			var output = JavaScript.eval("window.crypto.getRandomValues(new Uint8Array(16));")
+			if output is PoolByteArray and output.size() == 16:
 				data = output
 
-		if data == null:
+		if not data:
 			# Generate weak random values
 			# ONLY when Crypto is not provided by the browser
-			var random = RandomNumberGenerator.new()
-			random.randomize()
-			data = PackedByteArray([
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random),
-				_randb(random), _randb(random), _randb(random), _randb(random)
+			randomize()
+			data = PoolByteArray([
+				_randb(), _randb(), _randb(), _randb(),
+				_randb(), _randb(), _randb(), _randb(),
+				_randb(), _randb(), _randb(), _randb(),
+				_randb(), _randb(), _randb(), _randb()
 			])
 
 	else:
@@ -121,14 +120,14 @@ static func v4bin() -> PackedByteArray:
 	return data
 
 # Format any 16 bytes as a UUID.
-static func format(data: PackedByteArray) -> String:
+static func format(data: PoolByteArray) -> String:
 	assert(data.size() == 16)
 	return '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x' % (data as Array)
 
 
 # Private helper func
-static func _randb(random: RandomNumberGenerator) -> int:
-	return random.randi() % 0x100
+static func _randb() -> int:
+	return randi() % 0x100
 
 
 static func _hex_byte(text: String, offset: int) -> int:

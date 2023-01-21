@@ -1,4 +1,4 @@
-extends RefCounted
+extends Reference
 class_name JsonSerializable
 
 # **VIRTUAL**
@@ -12,7 +12,7 @@ func _get_type_for_property(property_name: String):
 	return ""
 
 # Marshals an object - recursively - into a dictionary
-# @returns Dictionary - A Dictionary representation of this object instance
+# @returns Dictionary - A Dcitionary representation of this object instance
 func to_dict() -> Dictionary:
 
 	var dict = {}
@@ -21,7 +21,7 @@ func to_dict() -> Dictionary:
 	# Skipping the first 3 items because they are metadata we do not need
 	for i in range(3, props.size()):
 		var prop = props[i]
-		var name = prop["name"] # The name of the property checked the object. WIll be used to access its's value
+		var name = prop["name"] # The name of the property on the object. WIll be used to access its's value
 		var type = prop["type"]	# The godot built-in type (Array, Object etc)
 
 		if (type == TYPE_OBJECT):
@@ -77,14 +77,13 @@ func from_dict(data: Dictionary, instance: JsonSerializable):
 
 # Instantiate a class by name
 # @param name: String - A class name
-# @returns RefCounted - The instance reference
-func get_class_instance(name: String) -> RefCounted:
-	var class_list = ClassDB.get_class_list()
-	var json = var_to_str(class_list)
-	var has = class_list.has(name)
-	var exists = ClassDB.class_exists(name)
-	if ClassDB.can_instantiate(name):
-		return ClassDB.instantiate(name)
+# @returns Reference - The instance reference
+func get_class_instance(name: String) -> Reference:
+	var classes = ProjectSettings.get_setting("_global_script_classes")
+	for element in classes:
+		if element["class"] == name:
+			return load(element["path"]).new()
+
 
 	push_error("Class \"" + name + "\" could not be found")
 	return null

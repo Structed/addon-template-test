@@ -1,4 +1,4 @@
-extends RefCounted
+extends Reference
 class_name ApiErrorWrapper
 
 # Numerical HTTP code
