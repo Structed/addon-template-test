@@ -7,6 +7,7 @@ This repository only contains the add-on. See
 for the demonstration project.
 
 ## Features
+blashblah
 
 - ADDON_FEATURE_1
 - ADDON_FEATURE_2
