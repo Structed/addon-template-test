@@ -46,16 +46,16 @@ jobs:
           - name: "Write changelog"
             run: |
               CHANGELOG=""
-              if [ -e addons/ADDON_NAME/CHANGELOG.md ]
+              if [ -e addons/godot-playfab/CHANGELOG.md ]
               then
-                  CHANGELOG=$(cat addons/ADDON_NAME/CHANGELOG.md)
+                  CHANGELOG=$(cat addons/godot-playfab/CHANGELOG.md)
               fi
-              echo -e "${{steps.calculate_version.outputs.changelog}}\n\n${CHANGELOG}" > addons/ADDON_NAME/CHANGELOG.md
+              echo -e "${{steps.calculate_version.outputs.changelog}}\n\n${CHANGELOG}" > addons/godot-playfab/CHANGELOG.md
             if: github.ref == 'refs/heads/main' && steps.calculate_version.outputs.new_version != ''
 
           - name: "Update version in plugin.cfg"
             run: |
-              sed -i -re 's/version=".+$/version="${{ steps.calculate_version.outputs.new_version }}"/gi' addons/ADDON_NAME/plugin.cfg
+              sed -i -re 's/version=".+$/version="${{ steps.calculate_version.outputs.new_version }}"/gi' addons/godot-playfab/plugin.cfg
             if: steps.calculate_version.outputs.new_version != ''
 
           - name: "Commit"
@@ -89,8 +89,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ADDON_NAME-${{ steps.create_version.outputs.new_tag }}
-          path: addons/ADDON_NAME/
+          name: godot-playfab-${{ steps.create_version.outputs.new_tag }}
+          path: addons/godot-playfab/
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
         if: steps.create_version.outputs.new_version != ''
 
@@ -125,8 +125,8 @@ jobs:
       # Using https://github.com/KikimoraGames/itch-publish
       - uses: actions/download-artifact@v3
         with:
-          name: ADDON_NAME-${{ steps.calculate_version.outputs.previous_tag }}
-          path: addons/ADDON_NAME/
+          name: godot-playfab-${{ steps.calculate_version.outputs.previous_tag }}
+          path: addons/godot-playfab/
 
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:

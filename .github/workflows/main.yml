@@ -47,7 +47,7 @@ jobs:
           # e.g. 0.6 means 60% of your tests must pass
           minimum-pass: "1.0"
           # the directory containing Gut tests
-          test-dir: "res://addons/ADDON_NAME/test"
+          test-dir: "res://addons/godot-playfab/test"
           # instead of running GUT's command line tool, you can run a GUT test scene if you have one
           # set up correctly
           # helps enable things like mouse mocking and current scene to work without any extra coding steps
