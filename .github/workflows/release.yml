@@ -13,58 +13,58 @@ permissions:
   contents: write
 
 env:
+  ADDON_NAME: ADDON_NAME
   ITCH_USERNAME: ADDON_NAME_ITCH_USER_NAME
   ITCH_GAME_ID: ADDON_NAME_ITCH_GAME_ID
   ASSET_LIB_USERNAME: ADDON_NAME_ASSET_LIB_USER_NAME
-  ASSET_LIB_PASSSWORD: ${{ secrets.ASSET_STORE_PASSWORD }}
   ASSET_LIB_ASSET_ID: ADDON_NAME_ASSET_LIB_ASSET_ID
 
 jobs:
   prerelease:
-      if: "github.event.head_commit.message != 'Release preparation: storing Version and Changelog'"
-      name: Preparing release
-      runs-on: ubuntu-latest
-      steps:
-          - uses: actions/checkout@v3
-            with:
-              fetch-depth: 0
-              token: ${{ secrets.GITHUB_TOKEN }}
+    if: "github.event.head_commit.message != 'Release preparation: storing Version and Changelog'"
+    name: Preparing release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-          - name: Calculate version
-            id: calculate_version
-            uses: mathieudutour/github-tag-action@v6.1
-            with:
-              tag_prefix: ""
-              github_token: ${{ secrets.GITHUB_TOKEN }}
-              dry_run: true
-              default_bump: false
-              custom_release_rules: |
-                  "fix:patch:Bug Fixes,hotfix:patch:Bug Fixes,feature:minor:Features,change:minor:Changes,breaking:major:Breaking Changes,major:major:Major Changes"
+      - name: Calculate version
+        id: calculate_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          tag_prefix: ""
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+          default_bump: false
+          custom_release_rules: |
+            "fix:patch:Bug Fixes,hotfix:patch:Bug Fixes,feature:minor:Features,change:minor:Changes,breaking:major:Breaking Changes,major:major:Major Changes"
 
-          - name: "Write changelog"
-            run: |
-              CHANGELOG=""
-              if [ -e addons/godot-playfab/CHANGELOG.md ]
-              then
-                  CHANGELOG=$(cat addons/godot-playfab/CHANGELOG.md)
-              fi
-              echo -e "${{steps.calculate_version.outputs.changelog}}\n\n${CHANGELOG}" > addons/godot-playfab/CHANGELOG.md
-            if: github.ref == 'refs/heads/main' && steps.calculate_version.outputs.new_version != ''
+      - name: "Write changelog"
+        run: |
+          CHANGELOG=""
+              if [ -e addons/${{env.ADDON_NAME}}/CHANGELOG.md ]
+          then
+                  CHANGELOG=$(cat addons/${{env.ADDON_NAME}}/CHANGELOG.md)
+          fi
+              echo -e "${{steps.calculate_version.outputs.changelog}}\n\n${CHANGELOG}" > addons/${{env.ADDON_NAME}}/CHANGELOG.md
+        if: github.ref == 'refs/heads/main' && steps.calculate_version.outputs.new_version != ''
 
-          - name: "Update version in plugin.cfg"
-            run: |
-              sed -i -re 's/version=".+$/version="${{ steps.calculate_version.outputs.new_version }}"/gi' addons/godot-playfab/plugin.cfg
-            if: steps.calculate_version.outputs.new_version != ''
+      - name: "Update version in plugin.cfg"
+        run: |
+          sed -i -re 's/version=".+$/version="${{ steps.calculate_version.outputs.new_version }}"/gi' addons/${{env.ADDON_NAME}}/plugin.cfg
+        if: steps.calculate_version.outputs.new_version != ''
 
-          - name: "Commit"
-            uses: EndBug/add-and-commit@v7.2.1
-            with:
-              message: 'Release preparation: storing Version and Changelog'
-              push: true
-            if: steps.calculate_version.outputs.new_version != ''
+      - name: "Commit"
+        uses: EndBug/add-and-commit@v7.2.1
+        with:
+          message: 'Release preparation: storing Version and Changelog'
+          push: true
+        if: steps.calculate_version.outputs.new_version != ''
 
   release:
-      # Create release only after the version was bumped and release notes added:
+    # Create release only after the version was bumped and release notes added:
     if: "github.event.head_commit.message == 'Release preparation: storing Version and Changelog'"
     runs-on: ubuntu-latest
 
@@ -87,8 +87,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: godot-playfab-${{ steps.create_version.outputs.new_tag }}
-          path: addons/godot-playfab/
+          name: ${{env.ADDON_NAME}}-${{ steps.create_version.outputs.new_tag }}
+          path: addons/${{env.ADDON_NAME}}/
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
         if: steps.create_version.outputs.new_version != ''
 
@@ -123,8 +123,8 @@ jobs:
       # Using https://github.com/KikimoraGames/itch-publish
       - uses: actions/download-artifact@v3
         with:
-          name: godot-playfab-${{ steps.calculate_version.outputs.previous_tag }}
-          path: addons/godot-playfab/
+          name: ${{env.ADDON_NAME}}-${{ steps.calculate_version.outputs.previous_tag }}
+          path: addons/${{env.ADDON_NAME}}/
 
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
@@ -148,18 +148,18 @@ jobs:
           id: calculate_version
           uses: mathieudutour/github-tag-action@v6.0
           with:
-              tag_prefix: "v"
-              github_token: ${{ secrets.GITHUB_TOKEN }}
-              dry_run: true
-              default_bump: false
+            tag_prefix: "v"
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            dry_run: true
+            default_bump: false
 
       - name: Set Version
         run: |
-            echo "version=${{ steps.calculate_version.outputs.previous_tag }}" >> $GITHUB_ENV
+          echo "version=${{ steps.calculate_version.outputs.previous_tag }}" >> $GITHUB_ENV
 
       - name: Godot Asset Lib
         uses: deep-entertainment/godot-asset-lib-action@v0.4.0
         with:
           username: ${{ env.ASSET_LIB_USERNAME }}
-          password: ${{ env.ASSET_LIB_PASSSWORD }}
+          password: ${{ secrets.ASSET_LIB_PASSWORD }}
           assetId: ${{ env.ASSET_LIB_ASSET_ID }}
