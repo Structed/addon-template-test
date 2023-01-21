@@ -11,6 +11,29 @@
 
 * comment custom release trigger definition ([ede7ba3](https://github.com/Structed/addon-template-test/commit/ede7ba326351f51e6b22df3716ff4561f9880cfa))
 * re-add custom trigger definition ([a1ed23b](https://github.com/Structed/addon-template-test/commit/a1ed23b299dd50857b65351d36f63ba41fdd7db3))
+* set ADDON_NAME to godot-playfab ([5c2de9a](https://github.com/Structed/addon-template-test/commit/5c2de9aeb8d4c5700a17df85c4eac5cb12b46fee))
+* use ADDON_NAME env var * fix ASSET_LIB_PASSWORD ([83d0c8a](https://github.com/Structed/addon-template-test/commit/83d0c8a81ce7dac570f127e1ccd40504509d1a52))
+
+
+### Breaking Changes
+
+* new custom release rules ([e3e8705](https://github.com/Structed/addon-template-test/commit/e3e8705fb620fe7b093c4e83b60fd0148043e90c))
+
+
+
+## [2.0.0](https://github.com/Structed/addon-template-test/compare/1.0.0...2.0.0) (2023-01-21)
+
+
+### Features
+
+* Add permissions ([63b669a](https://github.com/Structed/addon-template-test/commit/63b669a18750c32d96a05cfd3d168e42a785b2f7))
+* remove custom rules ([9d1aa1c](https://github.com/Structed/addon-template-test/commit/9d1aa1c6066ceb806a44ce7fa6f041be57555435))
+
+
+### Bug Fixes
+
+* comment custom release trigger definition ([ede7ba3](https://github.com/Structed/addon-template-test/commit/ede7ba326351f51e6b22df3716ff4561f9880cfa))
+* re-add custom trigger definition ([a1ed23b](https://github.com/Structed/addon-template-test/commit/a1ed23b299dd50857b65351d36f63ba41fdd7db3))
 
 
 ### Breaking Changes
