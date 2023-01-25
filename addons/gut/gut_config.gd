@@ -2,7 +2,7 @@ var Gut = load('res://addons/gut/gut.gd')
 
 # Do not want a ref to _utils here due to use by editor plugin.
 # _utils needs to be split so that constants and what not do not
-# have to rely checked the weird singleton thing I made.
+# have to rely on the weird singleton thing I made.
 enum DOUBLE_STRATEGY{
 	FULL,
 	PARTIAL
@@ -68,9 +68,7 @@ func _load_options_from_config_file(file_path, into):
 	var json = f.get_as_text()
 	f.close()
 
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(json)
-	var results = test_json_conv.get_data()
+	var results = JSON.parse(json)
 	# SHORTCIRCUIT
 	if(results.error != OK):
 		print("\n\n",'!! ERROR parsing file:  ', file_path)
@@ -89,7 +87,7 @@ func _load_options_from_config_file(file_path, into):
 
 
 func write_options(path):
-	var content = JSON.stringify(options, ' ')
+	var content = JSON.print(options, ' ')
 
 	var f = File.new()
 	var result = f.open(path, f.WRITE)
