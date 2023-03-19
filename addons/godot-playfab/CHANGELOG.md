@@ -1,3 +1,18 @@
+## [1.1.0](https://github.com/Structed/addon-template-test/compare/1.0.0...1.1.0) (2023-03-19)
+
+
+### Bug Fixes
+
+* removed GHA warnings by updating EndBug/add-and-commit@v9.1.1 ([8fb6632](https://github.com/Structed/addon-template-test/commit/8fb66327b1e9dbcc34304beeb826caa2c5fdeb9d))
+* whitespace ([e4dfc6f](https://github.com/Structed/addon-template-test/commit/e4dfc6f03ea122d5aa97f2e2b243a67928e74d35))
+
+
+### Changes
+
+* Update action  ([5a20997](https://github.com/Structed/addon-template-test/commit/5a20997c4ec8e3a85382e34b9b406f9fc2c69411))
+
+
+
 ### [0.3.4](https://github.com/Structed/godot-playfab/compare/0.3.3...0.3.4) (2023-01-25)
 
 
