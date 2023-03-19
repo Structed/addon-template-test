@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 env:
-  ADDON_NAME: ADDON_NAME
+  ADDON_NAME: godot-playfab
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
